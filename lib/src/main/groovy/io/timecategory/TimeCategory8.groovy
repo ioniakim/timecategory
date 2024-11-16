@@ -1,3 +1,6 @@
+package io.timecategory
+
+
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
@@ -122,11 +125,17 @@ class TemporalUnitWrapper {
         this.unit = unit
     }
 
-    TemporalOperationWrapper plus(TemporalUnitWrapper other) {
+    TemporalOperationWrapper plus(Object other) {
+        if (!(other instanceof TemporalUnitWrapper || other instanceof Temporal)) {
+            throw new UnsupportedOperationException("Unsupported type: ${other.class}")
+        }
         new TemporalOperationWrapper().add(this).add(other)
     }
 
-    TemporalOperationWrapper minus(TemporalUnitWrapper other) {
+    TemporalOperationWrapper minus(Object other) {
+        if (!(other instanceof TemporalUnitWrapper || other instanceof Temporal)) {
+            throw new UnsupportedOperationException("Unsupported type: ${other.class}")
+        }
         new TemporalOperationWrapper().add(this).subtract(other)
     }
 
@@ -173,5 +182,10 @@ class TemporalOperationWrapper {
                 throw new UnsupportedOperationException("Cannot apply ${operation.class}")
             }
         }
+    }
+
+    @Override
+    String toString() {
+        return "Unresolved TemporalOperationWrapper: ${operations}"
     }
 }
