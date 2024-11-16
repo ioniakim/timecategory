@@ -1,3 +1,7 @@
+// TODO Save this code to be used in other source code
+// TODO Add associativity between time unit and time object
+// TODO Figure out any potential problems caused by time zones
+
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
