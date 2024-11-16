@@ -34,7 +34,7 @@ TimeCategory8.use {
     println "2 days later: $twoDaysLater"
 
     // Add 3 weeks
-    def threeWeeksLater = 4.weeks + today - 1.weeks
+    def threeWeeksLater = 4.weeks + 1.days + today - 1.weeks - 1.days
     println "3 weeks later: $threeWeeksLater"
 
     // Add 1 year
