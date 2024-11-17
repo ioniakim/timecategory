@@ -7,7 +7,22 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
 
+/**
+ * Represents a utility class for enhancing Java's time-related classes
+ * (e.g., LocalDateTime, LocalDate, LocalTime) with dynamic Groovy methods.
+ * Provides functionality to use custom temporal operations, such as adding or
+ * subtracting time units directly from numeric types.
+ * @author: ionia.kim
+ * @since: 2024-11-16
+ */
 class TimeCategory8 {
+    /**
+     * Main entry point for applying enhancements. Temporarily replaces the
+     * metaClass of relevant classes with augmented capabilities, executes the
+     * provided closure, and restores the original metaClasses afterwards.
+     *
+     * @param closure The closure containing the code that utilizes the enhanced time capabilities.
+     */
     static void use(Closure closure) {
         def originalMetaClasses = [:]
 
@@ -32,6 +47,10 @@ class TimeCategory8 {
         }
     }
 
+    /**
+     * Dynamically adds properties to `Integer` and `Long` to enable time unit operations.
+     * For example, 5.seconds or 3.years.
+     */
     private static void enhanceIntegerAndLong() {
         def timeUnits = [
             "seconds": ChronoUnit.SECONDS,
@@ -53,6 +72,10 @@ class TimeCategory8 {
         }
     }
 
+    /**
+     * Enhances time-related classes (e.g., LocalDateTime, LocalDate) to support dynamic
+     * addition and subtraction of temporal units and custom time operations.
+     */
     private static void enhanceTimeClasses() {
         // Enhance LocalDateTime, LocalDate, and LocalTime to support addition and subtraction
         [LocalDateTime, LocalDate, LocalTime].each { temporalClass ->
@@ -113,20 +136,42 @@ class TimeCategory8 {
         }
     }
 
+    /**
+     * Saves the original metaClass of a given class to allow restoration
+     * after dynamic modifications.
+     *
+     * @param clazz The class whose metaClass should be saved.
+     * @param originalMetaClasses Map to store the original metaClass.
+     */
     private static void saveMetaClass(Class clazz, Map originalMetaClasses) {
         originalMetaClasses[clazz] = GroovySystem.metaClassRegistry.getMetaClass(clazz)
     }
 }
 
+/**
+ * Wraps a temporal unit (e.g., DAYS, HOURS) along with its amount for dynamic operations.
+ */
 class TemporalUnitWrapper {
     final int amount
     final ChronoUnit unit
 
+    /**
+     * Constructs a wrapper for a temporal unit with its corresponding amount.
+     *
+     * @param amount The number of units.
+     * @param unit The temporal unit (e.g., ChronoUnit.DAYS).
+     */
     TemporalUnitWrapper(int amount, ChronoUnit unit) {
         this.amount = amount
         this.unit = unit
     }
 
+    /**
+     * Combines this temporal unit with another to create a compound operation.
+     *
+     * @param other Another TemporalUnitWrapper or Temporal object.
+     * @return A TemporalOperationWrapper containing the combined operation.
+     */
     TemporalOperationWrapper plus(Object other) {
         if (!(other instanceof TemporalUnitWrapper || other instanceof Temporal)) {
             throw new UnsupportedOperationException("Unsupported type: ${other.class}")
@@ -134,6 +179,12 @@ class TemporalUnitWrapper {
         new TemporalOperationWrapper().add(this).add(other)
     }
 
+    /**
+     * Subtracts another temporal unit from this one.
+     *
+     * @param other Another TemporalUnitWrapper or Temporal object.
+     * @return A TemporalOperationWrapper containing the resultant operation.
+     */
     TemporalOperationWrapper minus(Object other) {
         if (!(other instanceof TemporalUnitWrapper || other instanceof Temporal)) {
             throw new UnsupportedOperationException("Unsupported type: ${other.class}")
@@ -150,19 +201,40 @@ class TemporalUnitWrapper {
     }
 }
 
+/**
+ * Encapsulates a sequence of temporal operations (additions or subtractions)
+ * that can be applied to a Temporal object.
+ */
 class TemporalOperationWrapper {
     private final List<Object> operations = []
 
+    /**
+     * Adds an operation to the list of temporal operations.
+     *
+     * @param item The operation to add (e.g., a TemporalUnitWrapper).
+     * @return The updated TemporalOperationWrapper.
+     */
     TemporalOperationWrapper add(Object item) {
         operations << item
         this
     }
 
+    /**
+     * Subtracts a temporal unit by adding its negated version.
+     *
+     * @param unitWrapper The temporal unit to subtract.
+     * @return The updated TemporalOperationWrapper.
+     */
     TemporalOperationWrapper subtract(TemporalUnitWrapper unitWrapper) {
         operations << new TemporalUnitWrapper(-unitWrapper.amount, unitWrapper.unit)
         this
     }
 
+    /**
+     * Negates all operations in this wrapper (e.g., inverting additions and subtractions).
+     *
+     * @return The updated TemporalOperationWrapper with negated operations.
+     */
     TemporalOperationWrapper negate() {
         operations.replaceAll { op ->
             if (op instanceof TemporalUnitWrapper) {
@@ -174,6 +246,12 @@ class TemporalOperationWrapper {
         this
     }
 
+    /**
+     * Applies the sequence of operations to a base Temporal object.
+     *
+     * @param temporal The base Temporal object to apply operations to.
+     * @return The resulting Temporal object after applying all operations.
+     */
     Temporal applyTo(Temporal temporal) {
         if (temporal == null) {
             throw new UnsupportedOperationException(
