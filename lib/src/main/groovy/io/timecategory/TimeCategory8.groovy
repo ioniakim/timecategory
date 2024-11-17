@@ -173,6 +173,11 @@ class TemporalOperationWrapper {
     }
 
     Temporal applyTo(Temporal temporal) {
+        if (temporal == null) {
+            throw new UnsupportedOperationException(
+                    "Cannot resolve TemproalOperationWrapper without a base Temporal object"
+            )
+        }
         operations.inject(temporal) { result, operation ->
             if (operation instanceof TemporalUnitWrapper) {
                 result.plus(operation.amount, operation.unit)
@@ -182,10 +187,5 @@ class TemporalOperationWrapper {
                 throw new UnsupportedOperationException("Cannot apply ${operation.class}")
             }
         }
-    }
-
-    @Override
-    String toString() {
-        return "Unresolved TemporalOperationWrapper: ${operations}"
     }
 }

@@ -44,15 +44,16 @@ class TimeCategory8Test extends Specification {
         }
     }
 
-    def "should handle unresolved TemporalOperationWrapper"() {
+    def "should throw exception when no temporal object is geven in expression"() {
         setup:
+        when:
         TimeCategory8.use {
-            when:
-            def operation = 4.weeks + 2.days - 1.weeks
-
-            then:
-            operation.toString().contains("Unresolved TemporalOperationWrapper")
+            def result = 4.weeks + 2.days - 1.weeks
+            result.applyTo(null) // Attempt to resolve without a base Temporal
         }
+
+        then:
+        thrown(UnsupportedOperationException)
     }
 
     def "should resolve TemporalOperationWrapper with LocalDate"() {
